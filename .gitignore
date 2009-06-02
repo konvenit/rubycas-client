@@ -3,3 +3,5 @@ pkg
 doc
 *.swp
 .DS_Store
+spec/rubycas-client.sqlite3.db
+spec/log/test.log
