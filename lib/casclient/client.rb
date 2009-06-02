@@ -22,10 +22,10 @@ module CASClient
       @service_url  = conf[:service_url]
       @proxy_callback_url  = conf[:proxy_callback_url]
       @proxy_retrieval_url = conf[:proxy_retrieval_url]
-      
+
       @username_session_key         = conf[:username_session_key] || :cas_user
       @extra_attributes_session_key = conf[:extra_attributes_session_key] || :cas_extra_attributes
-      
+
       @log = CASClient::LoggerWrapper.new
       @log.set_real_logger(conf[:logger]) if conf[:logger]
     end
@@ -87,9 +87,9 @@ module CASClient
       h['renew'] = 1 if st.renew
       h['pgtUrl'] = proxy_callback_url if proxy_callback_url
       uri.query = hash_to_query(h)
-      
+
       st.response = request_cas_response(uri, ValidationResponse)
-      
+
       return st
     end
     alias validate_proxy_ticket validate_service_ticket
