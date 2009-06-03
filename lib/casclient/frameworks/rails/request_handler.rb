@@ -5,6 +5,10 @@ module CASClient
 
         attr_accessor :use_gatewaying
 
+        def self.handle_request(controller, use_gatewaying=false)
+          new(controller, use_gatewaying=false).handle_request
+        end
+
         def initialize(controller, use_gatewaying=false)
           @controller = controller
           @use_gatewaying = use_gatewaying
