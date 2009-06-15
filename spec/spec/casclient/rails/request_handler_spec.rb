@@ -90,7 +90,7 @@ describe CASClient::Frameworks::Rails::RequestHandler do
     describe "which has not been invalidated remotely" do
 
       before :each do
-        @ticket.response = mock(:response, :pgt_iou => false)
+        @ticket.response = mock(:response, :pgt_iou => false, :is_success? => true, :user => "my_user_name", :extra_attributes => {})
       end
 
       it "should allow access if not authenticating on every request " do
@@ -114,9 +114,9 @@ describe CASClient::Frameworks::Rails::RequestHandler do
         @ticket.response = mock(:response, :is_success? => false, :failure_code => 404, :failure_message => "some message")
       end
 
-      it "should allow acces if not authenticating on every request" do
+      it "should allow access if not authenticating on every request" do
         CASClient::Frameworks::Rails::Filter.config[:authenticate_on_every_request] = false
-        @ticket.response = mock(:response, :pgt_iou => false)
+        @ticket.response = mock(:response, :pgt_iou => false, :is_success? => true, :user => "my_user_name", :extra_attributes => {})
         @request_handler.handle_request.should == :allow
       end
 

@@ -39,6 +39,20 @@ module CASClient
           @@log = client.log
         end
 
+        # this guesses the service_url which is requesting the login
+        def self.read_service_url(controller)
+          if config[:service_url]
+            log.debug("Using explicitly set service url: #{config[:service_url]}")
+            return config[:service_url]
+          end
+
+          params = controller.params.dup
+          params.delete(:ticket)
+          service_url = controller.url_for(params)
+          log.debug("Guessed service url: #{service_url.inspect}")
+          return service_url
+        end
+
         # Returns the login URL for the current controller. 
         # Useful when you want to provide a "Login" link in a GatewayFilter'ed
         # action. 

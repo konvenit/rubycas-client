@@ -17,10 +17,9 @@ module CASClient
         def handle_request
           return :single_sign_out if single_sign_out?(@controller)
 
-          st, require_validation = determine_request_context(@controller)
-
+          st = determine_request_context(@controller)
           if st
-            handle_ticket(@controller, st, require_validation)
+            handle_ticket(@controller, st)
           else
             handle_no_ticket(@controller)
           end
@@ -40,12 +39,12 @@ module CASClient
 
         private
           # high level request handlers
-          def handle_ticket(controller, st, require_validation)
-            st = client.validate_service_ticket(st) if require_validation and not st.has_been_validated?
+          def handle_ticket(controller, st)
+            st = client.validate_service_ticket(st) unless st.has_been_validated?
             vr = st.response
 
-            if !require_validation or st.is_valid?
-              setup_new_session(controller, st, vr) if require_validation
+            if st.is_valid?
+              setup_new_session(controller, st, vr)
 
               # Store the ticket in the session to avoid re-validating the same service
               # ticket with the CAS server.
@@ -204,8 +203,6 @@ module CASClient
             last_st = controller.session[:cas_last_valid_ticket]
             st = read_ticket(controller)
 
-            require_validation = true
-
             if st && last_st && 
                 last_st.ticket == st.ticket && 
                 last_st.service == st.service
@@ -214,7 +211,6 @@ module CASClient
               # the same ticket happens to be in the URL.
               log.warn("Re-using previously validated ticket since the ticket id and service are the same.")
               st = last_st
-              require_validation = false
             elsif last_st &&
                 !config[:authenticate_on_every_request] && 
                 controller.session[client.username_session_key]
@@ -226,15 +222,13 @@ module CASClient
               log.debug "Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
                 "Previous ticket #{last_st.ticket.inspect} will be re-used."
               st = last_st
-              require_validation = false
             elsif last_st &&
                 config[:authenticate_on_every_request] && 
                 controller.session[client.username_session_key]
               st = last_st
-              require_validation = true
             end
 
-            [st, require_validation]
+            st
           end
 
           def read_ticket(controller)
@@ -268,7 +262,7 @@ module CASClient
             log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{vr.user.inspect} is VALID.")
             controller.session[client.username_session_key] = vr.user.dup
             controller.session[client.extra_attributes_session_key] = HashWithIndifferentAccess.new(vr.extra_attributes.dup)
-            
+
             if vr.extra_attributes
               log.debug("Extra user attributes provided along with ticket #{st.ticket.inspect}: #{vr.extra_attributes.inspect}.")
             end
