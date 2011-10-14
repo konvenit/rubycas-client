@@ -233,9 +233,7 @@ module CASClient
       uri = URI.parse(uri) unless uri.kind_of? URI
       req = Net::HTTP::Post.new(uri.path)
       req.set_form_data(data, ';')
-      https = Net::HTTP.new(uri.host, uri.port)
-      https.use_ssl = (uri.scheme == 'https')
-      https.start {|conn| conn.request(req) }
+      build_https(uri).start {|conn| conn.request(req) }
     end
 
     def query_to_hash(query)
@@ -254,7 +252,7 @@ module CASClient
     def build_https(uri)
       https = Net::HTTP.new(uri.host, uri.port)
       https.use_ssl = (uri.scheme == 'https')
-      if https.use_ssl and @ssl_verify_mode
+      if https.use_ssl? and @ssl_verify_mode
         https.verify_mode = @ssl_verify_mode
       end
       https
