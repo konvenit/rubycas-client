@@ -1,10 +1,10 @@
 module CASClient
   # The client brokers all HTTP transactions with the CAS server.
   class Client
-    attr_reader :cas_base_url
+    attr_reader :cas_base_url, :ssl_verify_mode
     attr_reader :log, :username_session_key, :extra_attributes_session_key
     attr_writer :login_url, :validate_url, :proxy_url, :logout_url, :service_url
-    attr_accessor :proxy_callback_url, :proxy_retrieval_url, :ssl_verify_mode
+    attr_accessor :proxy_callback_url, :proxy_retrieval_url
 
     def initialize(conf = nil)
       configure(conf) if conf
@@ -22,6 +22,7 @@ module CASClient
       @service_url  = conf[:service_url]
       @proxy_callback_url  = conf[:proxy_callback_url]
       @proxy_retrieval_url = conf[:proxy_retrieval_url]
+      @ssl_verify_mode     = conf[:ssl_verify_mode]
 
       @username_session_key         = conf[:username_session_key] || :cas_user
       @extra_attributes_session_key = conf[:extra_attributes_session_key] || :cas_extra_attributes
