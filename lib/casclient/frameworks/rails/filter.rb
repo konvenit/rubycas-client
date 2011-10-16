@@ -34,7 +34,7 @@ module CASClient
 
         def self.configure(config)
           @@config = config
-          @@config[:logger] = RAILS_DEFAULT_LOGGER unless @@config[:logger]
+          @@config[:logger] = ::Rails.logger unless @@config[:logger]
           @@client = CASClient::Client.new(config)
           @@log = client.log
         end
