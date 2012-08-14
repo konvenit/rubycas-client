@@ -246,7 +246,11 @@ module CASClient
           end
 
           def read_service_url(controller)
-            if config[:service_url]
+            if config[:service_url].is_a?(Proc)
+              service_url = config[:service_url].call(controller)
+              log.debug("Using explicitly set service url: #{service_url}")
+              return service_url
+            elsif config[:service_url]
               log.debug("Using explicitly set service url: #{config[:service_url]}")
               return config[:service_url]
             end
