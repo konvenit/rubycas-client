@@ -21,7 +21,7 @@ module CASClient
           when :single_sign_out
             controller.send(:render, :text => "CAS Single-Sign-Out request intercepted.")
             return false
-          when :allow
+          when :allow, :new_session
             return true
           when :to_login
             redirect_to_cas_for_authentication(controller)

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
+require File.dirname(__FILE__) + '/../../../spec_helper'
 
 describe CASClient::Frameworks::Rails::RequestHandler do
 
@@ -56,14 +56,14 @@ describe CASClient::Frameworks::Rails::RequestHandler do
       @session.should_receive(:[]=).with(:casfilteruser, "12345")
       @session.should_receive(:[]=).with(:cas_extra_attributes, {})
       @session.should_receive(:[]=).with(:cas_last_valid_ticket, @ticket)
-      @request_handler.handle_request.should == :allow
+      @request_handler.handle_request.should == :new_session
     end
 
     it "should allow acces without ticket if returning from gateway and gatewaying is enabled" do
       @controller.params.stub!(:[]).with(:ticket).and_return(nil)
       @session.stub!(:[]).with(:cas_sent_to_gateway).and_return(true)
       @request_handler.use_gatewaying = true
-      @request_handler.handle_request.should == :allow
+      @request_handler.handle_request.should == :new_session
     end
 
     it "should redirect to_login if no ticket is present in the params" do
