@@ -5,7 +5,7 @@ module CASClient
     
     def check_and_parse_xml(raw_xml)
       begin
-        doc = REXML::Document.new(raw_xml)
+        doc = REXML::Document.new(raw_xml.sub(/<\?xml[^\?]*\?>\s*/, ''))
       rescue REXML::ParseException => e
         raise BadResponseException, 
           "MALFORMED CAS RESPONSE:\n#{raw_xml.inspect}\n\nEXCEPTION:\n#{e}"
