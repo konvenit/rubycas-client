@@ -225,7 +225,9 @@ module CASClient
             elsif last_st &&
                 config[:authenticate_on_every_request] && 
                 controller.session[client.username_session_key]
-              st = last_st
+
+              client.validate_service_ticket(last_st)
+              st = last_st if last_st.is_valid?
             end
 
             st
