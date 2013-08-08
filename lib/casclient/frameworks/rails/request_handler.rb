@@ -219,7 +219,7 @@ module CASClient
                 controller.session[client.username_session_key]
 
               client.validate_service_ticket(last_st)
-              st = last_st if last_st.is_valid?
+              st = last_st.is_valid? ? last_st : nil
             end
 
             st
