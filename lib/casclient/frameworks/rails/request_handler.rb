@@ -161,7 +161,7 @@ module CASClient
 
           # Creates a file in tmp/sessions linking a SessionTicket
           # with the local Rails session id. The file is named
-          # cas_sess.<session ticket> and its text contents is the corresponding 
+          # cas_sess.<session ticket> and its text contents is the corresponding
           # Rails session id.
           # Returns the filename of the lookup file created.
           def store_service_session_lookup(st, sid)
@@ -204,7 +204,7 @@ module CASClient
             st = read_ticket(controller)
 
             if last_st &&
-                !config[:authenticate_on_every_request] &&
+                !authenticate_on_every_request?(controller) &&
                 controller.session[client.username_session_key]
               # Re-use the previous ticket if the user already has a local CAS session (i.e. if they were already
               # previously authenticated for this service). This is to prevent redirection to the CAS server on every
@@ -215,7 +215,7 @@ module CASClient
                             "Previous ticket #{last_st.ticket.inspect} will be re-used."
               st = last_st
             elsif last_st &&
-                config[:authenticate_on_every_request] &&
+                authenticate_on_every_request?(controller) &&
                 controller.session[client.username_session_key]
 
               client.validate_service_ticket(last_st)
@@ -291,6 +291,14 @@ module CASClient
 
           def use_gatewaying?
             @use_gatewaying
+          end
+
+          def authenticate_on_every_request?(controller)
+            if config[:authenticate_on_every_request].respond_to?(:call)
+              config[:authenticate_on_every_request].call(controller)
+            else
+              config[:authenticate_on_every_request]
+            end
           end
 
       end
