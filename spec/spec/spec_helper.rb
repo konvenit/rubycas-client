@@ -1,9 +1,8 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-ActionMailer::Base.delivery_method = :test
 
-require 'spec'
-require 'spec/rails'
+require 'rspec'
+require 'rspec/rails'
 
 # load the schema into the db
 load(File.join(File.dirname(__FILE__), "..", "config", "schema.rb"))

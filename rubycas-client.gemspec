@@ -18,19 +18,6 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.2.0}
   s.summary = %q{Client library for the Central Authentication Service (CAS) protocol.}
 
-  if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 2
-
-    if current_version >= 3 then
-      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
-      s.add_development_dependency(%q<hoe>, [">= 1.7.0"])
-    else
-      s.add_dependency(%q<activesupport>, [">= 0"])
-      s.add_dependency(%q<hoe>, [">= 1.7.0"])
-    end
-  else
-    s.add_dependency(%q<activesupport>, [">= 0"])
-    s.add_dependency(%q<hoe>, [">= 1.7.0"])
-  end
+  s.add_dependency("activesupport", '~> 3.2')
+  s.add_development_dependency("rails")
 end
