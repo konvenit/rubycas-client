@@ -17,9 +17,9 @@ module CASClient
         def handle_request
           return :single_sign_out if single_sign_out?(@controller)
 
-          st = determine_request_context(@controller)
+          st, new_session = determine_request_context(@controller)
           if st
-            handle_ticket(@controller, st)
+            handle_ticket(@controller, st, new_session)
           else
             handle_no_ticket(@controller)
           end
@@ -39,12 +39,12 @@ module CASClient
 
         private
           # high level request handlers
-          def handle_ticket(controller, st)
+          def handle_ticket(controller, st, new_session)
             st = client.validate_service_ticket(st) unless st.has_been_validated?
             vr = st.response
 
             if st.is_valid?
-              setup_new_session(controller, st, vr)
+              setup_new_session(controller, st, vr) if new_session
 
               # Store the ticket in the session to avoid re-validating the same service
               # ticket with the CAS server.
@@ -213,7 +213,7 @@ module CASClient
               # the :authenticate_on_every_request config option to false.
               log.debug "Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
                             "Previous ticket #{last_st.ticket.inspect} will be re-used."
-              st = last_st
+              [last_st, false]
             elsif last_st &&
                 authenticate_on_every_request?(controller) &&
                 controller.session[client.username_session_key]
@@ -222,14 +222,16 @@ module CASClient
 
               if last_st.is_valid?
                 st = last_st
+                [last_st, false]
               else
                 st = nil
                 controller.session[client.username_session_key] = nil
                 controller.session[:cas_last_valid_ticket]      = nil
+                [nil, false]
               end
             end
 
-            st
+            [st, true]
           end
 
           def read_ticket(controller)
