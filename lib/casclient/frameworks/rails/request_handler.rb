@@ -213,7 +213,7 @@ module CASClient
               # the :authenticate_on_every_request config option to false.
               log.debug "Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
                             "Previous ticket #{last_st.ticket.inspect} will be re-used."
-              [last_st, false]
+              return [last_st, false]
             elsif last_st &&
                 authenticate_on_every_request?(controller) &&
                 controller.session[client.username_session_key]
@@ -221,17 +221,15 @@ module CASClient
               client.validate_service_ticket(last_st)
 
               if last_st.is_valid?
-                st = last_st
-                [last_st, false]
+                return [last_st, false]
               else
-                st = nil
                 controller.session[client.username_session_key] = nil
                 controller.session[:cas_last_valid_ticket]      = nil
-                [nil, false]
+                return [nil, false]
               end
+            else
+              return [st, true]
             end
-
-            [st, true]
           end
 
           def read_ticket(controller)
