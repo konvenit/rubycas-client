@@ -47,8 +47,8 @@ module CASClient
           end
 
           params = controller.params.dup
-          params.delete(:ticket)
-          params.delete(:format) if params[:format].to_s == 'html'
+          params.delete!(:ticket)
+          params.delete!(:format) if params[:format].to_s == 'html'
           service_url = controller.url_for(params)
           log.debug("Guessed service url: #{service_url.inspect}")
           return service_url
