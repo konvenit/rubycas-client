@@ -17,9 +17,9 @@ module CASClient
         def handle_request
           return :single_sign_out if single_sign_out?(@controller)
 
-          st = determine_request_context(@controller)
+          st, new_session = determine_request_context(@controller)
           if st
-            handle_ticket(@controller, st)
+            handle_ticket(@controller, st, new_session)
           else
             handle_no_ticket(@controller)
           end
@@ -39,12 +39,12 @@ module CASClient
 
         private
           # high level request handlers
-          def handle_ticket(controller, st)
+          def handle_ticket(controller, st, new_session)
             st = client.validate_service_ticket(st) unless st.has_been_validated?
             vr = st.response
 
             if st.is_valid?
-              setup_new_session(controller, st, vr)
+              setup_new_session(controller, st, vr) if new_session
 
               # Store the ticket in the session to avoid re-validating the same service
               # ticket with the CAS server.
@@ -161,7 +161,7 @@ module CASClient
 
           # Creates a file in tmp/sessions linking a SessionTicket
           # with the local Rails session id. The file is named
-          # cas_sess.<session ticket> and its text contents is the corresponding 
+          # cas_sess.<session ticket> and its text contents is the corresponding
           # Rails session id.
           # Returns the filename of the lookup file created.
           def store_service_session_lookup(st, sid)
@@ -203,16 +203,8 @@ module CASClient
             last_st = controller.session[:cas_last_valid_ticket]
             st = read_ticket(controller)
 
-            if st && last_st && 
-                last_st.ticket == st.ticket && 
-                last_st.service == st.service
-              # warn() rather than info() because we really shouldn't be re-validating the same ticket. 
-              # The only situation where this is acceptable is if the user manually does a refresh and 
-              # the same ticket happens to be in the URL.
-              log.warn("Re-using previously validated ticket since the ticket id and service are the same.")
-              st = last_st
-            elsif last_st &&
-                !config[:authenticate_on_every_request] && 
+            if last_st &&
+                !authenticate_on_every_request?(controller) &&
                 controller.session[client.username_session_key]
               # Re-use the previous ticket if the user already has a local CAS session (i.e. if they were already
               # previously authenticated for this service). This is to prevent redirection to the CAS server on every
@@ -220,15 +212,24 @@ module CASClient
               # This behaviour can be disabled (so that every request is routed through the CAS server) by setting
               # the :authenticate_on_every_request config option to false.
               log.debug "Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
-                "Previous ticket #{last_st.ticket.inspect} will be re-used."
-              st = last_st
+                            "Previous ticket #{last_st.ticket.inspect} will be re-used."
+              return [last_st, false]
             elsif last_st &&
-                config[:authenticate_on_every_request] && 
+                authenticate_on_every_request?(controller) &&
                 controller.session[client.username_session_key]
-              st = last_st
-            end
 
-            st
+              client.validate_service_ticket(last_st)
+
+              if last_st.is_valid?
+                return [last_st, false]
+              else
+                controller.session[client.username_session_key] = nil
+                controller.session[:cas_last_valid_ticket]      = nil
+                return [nil, false]
+              end
+            else
+              return [st, true]
+            end
           end
 
           def read_ticket(controller)
@@ -246,23 +247,11 @@ module CASClient
           end
 
           def read_service_url(controller)
-            if config[:service_url].is_a?(Proc)
-              service_url = config[:service_url].call(controller)
-              log.debug("Using explicitly set service url: #{service_url}")
-              return service_url
-            elsif config[:service_url]
-              log.debug("Using explicitly set service url: #{config[:service_url]}")
-              return config[:service_url]
-            end
-
-            params = controller.params.dup
-            params.delete(:ticket)
-            service_url = controller.url_for(params)
-            log.debug("Guessed service url: #{service_url.inspect}")
-            return service_url
+            CASClient::Frameworks::Rails::Filter.read_service_url(controller)
           end
 
           def setup_new_session(controller, st, vr)
+            controller.send(:reset_session)
             log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{vr.user.inspect} is VALID.")
             controller.session[client.username_session_key] = vr.user.dup
             controller.session[client.extra_attributes_session_key] = HashWithIndifferentAccess.new(vr.extra_attributes.dup)
@@ -290,6 +279,14 @@ module CASClient
 
           def use_gatewaying?
             @use_gatewaying
+          end
+
+          def authenticate_on_every_request?(controller)
+            if config[:authenticate_on_every_request].respond_to?(:call)
+              config[:authenticate_on_every_request].call(controller)
+            else
+              config[:authenticate_on_every_request]
+            end
           end
 
       end
