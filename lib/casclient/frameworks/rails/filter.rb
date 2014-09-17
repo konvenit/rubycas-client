@@ -41,15 +41,22 @@ module CASClient
 
         # this guesses the service_url which is requesting the login
         def self.read_service_url(controller)
-          if config[:service_url]
-            log.debug("Using explicitly set service url: #{config[:service_url]}")
-            return config[:service_url]
-          end
+          if config[:service_url].is_a?(Proc)
+              service_url = config[:service_url].call(controller)
+              log.debug("Using explicitly set service url: #{service_url}")
+              return service_url
+            elsif config[:service_url]
+              log.debug("Using explicitly set service url: #{config[:service_url]}")
+              return config[:service_url]
+            end
 
           params = controller.params.dup
           params.delete(:ticket)
+          params.delete(:format) if params[:format].to_s == 'html'
+::Rails.logger.info params.inspect
+
           service_url = controller.url_for(params)
-          log.debug("Guessed service url: #{service_url.inspect}")
+          ::Rails.logger.info("Guessed service url: #{service_url.inspect}")
           return service_url
         end
 
