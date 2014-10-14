@@ -251,7 +251,7 @@ module CASClient
           end
 
           def setup_new_session(controller, st, vr)
-            controller.send(:reset_session)
+            controller.send(:clear_logins)
             log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{vr.user.inspect} is VALID.")
             controller.session[client.username_session_key] = vr.user.dup
             controller.session[client.extra_attributes_session_key] = HashWithIndifferentAccess.new(vr.extra_attributes.dup)
