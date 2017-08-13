@@ -48,7 +48,7 @@ module CASClient
 
               # Store the ticket in the session to avoid re-validating the same service
               # ticket with the CAS server.
-              controller.session[:cas_last_valid_ticket] = st
+              controller.session[:cas_last_valid_ticket] = st.as_json
 
               handle_pgt_request(vr) if vr and vr.pgt_iou
 
