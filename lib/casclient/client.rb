@@ -1,7 +1,7 @@
 module CASClient
   # The client brokers all HTTP transactions with the CAS server.
   class Client
-    attr_reader :cas_base_url, :ssl_verify_mode
+    attr_reader :cas_base_url, :ssl_verify_mode, :login_ticket_url
     attr_reader :log, :username_session_key, :extra_attributes_session_key
     attr_writer :login_url, :validate_url, :proxy_url, :logout_url, :service_url
     attr_accessor :proxy_callback_url, :proxy_retrieval_url
@@ -20,6 +20,7 @@ module CASClient
       @validate_url = conf[:validate_url]
       @proxy_url    = conf[:proxy_url]
       @service_url  = conf[:service_url]
+      @login_ticket_url    = conf[:login_ticket_url] || (@login_url+"Ticket")
       @proxy_callback_url  = conf[:proxy_callback_url]
       @proxy_retrieval_url = conf[:proxy_retrieval_url]
       @ssl_verify_mode     = conf[:ssl_verify_mode]
@@ -143,7 +144,7 @@ module CASClient
     # This only works with RubyCAS-Server, since obtaining login
     # tickets in this manner is not part of the official CAS spec.
     def request_login_ticket
-      uri = URI.parse(login_url+'Ticket')
+      uri = URI.parse(login_ticket_url)
       https = build_https(uri)
       res = https.post(uri.path, ';')
 
