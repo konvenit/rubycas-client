@@ -8,3 +8,7 @@ group :test, :development do
 end
 
 gemspec
+
+group :development do
+  gem "konvenit_style", git: "git@github.com:konvenit/konvenit_style.git"
+end

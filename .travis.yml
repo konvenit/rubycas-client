@@ -1,0 +1,22 @@
+language: ruby
+rvm:
+  - 2.5.0
+  - 2.2.8
+
+sudo: false
+
+bundler_args: --without production
+
+stages:
+  - rubocop
+  - test
+
+jobs:
+  include:
+    - stage: rubocop
+      rvm: 2.5.0
+      script:
+        - bundle exec rubocop -D -c .rubocop.yml
+
+script:
+  - JENKINS=true bundle exec rspec --profile --order rand -f d
