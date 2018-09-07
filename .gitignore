@@ -7,3 +7,4 @@ spec/rubycas-client.sqlite3.db
 spec/log/test.log
 examples/rails/log/*
 .idea/
+.vscode/*.sql

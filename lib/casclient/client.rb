@@ -20,7 +20,7 @@ module CASClient
       @validate_url = conf[:validate_url]
       @proxy_url    = conf[:proxy_url]
       @service_url  = conf[:service_url]
-      @login_ticket_url    = conf[:login_ticket_url] || (@login_url+"Ticket")
+      @login_ticket_url    = conf[:login_ticket_url]
       @proxy_callback_url  = conf[:proxy_callback_url]
       @proxy_retrieval_url = conf[:proxy_retrieval_url]
       @ssl_verify_mode     = conf[:ssl_verify_mode]
@@ -38,6 +38,10 @@ module CASClient
 
     def validate_url
       @validate_url || (cas_base_url + "/proxyValidate")
+    end
+
+    def login_ticket_url
+      @login_ticket_url || (login_url+"Ticket")
     end
 
     # Returns the CAS server's logout url.
