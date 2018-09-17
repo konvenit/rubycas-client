@@ -48,9 +48,9 @@ module CASClient
 
               # Store the ticket in the session to avoid re-validating the same service
               # ticket with the CAS server.
-              controller.session[:cas_last_valid_ticket] = st
+              controller.session[:cas_last_valid_ticket] = st.as_json
 
-              handle_pgt_request(vr) if vr.pgt_iou
+              handle_pgt_request(vr) if vr and vr.pgt_iou
 
               return :allow
             else
@@ -200,7 +200,7 @@ module CASClient
           end
 
           def determine_request_context(controller)
-            last_st = controller.session[:cas_last_valid_ticket]
+            last_st = deserialize controller.session[:cas_last_valid_ticket]
             st = read_ticket(controller)
 
             if last_st &&
@@ -213,6 +213,7 @@ module CASClient
               # the :authenticate_on_every_request config option to false.
               log.debug "Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
                             "Previous ticket #{last_st.ticket.inspect} will be re-used."
+              last_st.reused = true
               return [last_st, false]
             elsif last_st &&
                 authenticate_on_every_request?(controller) &&
@@ -229,6 +230,14 @@ module CASClient
               end
             else
               return [st, true]
+            end
+          end
+
+          def deserialize(ticket_or_hash)
+            if ticket_or_hash.is_a?(Hash)
+              ServiceTicket.new ticket_or_hash['ticket'], ticket_or_hash['service'], ticket_or_hash['renew']
+            else
+              ticket_or_hash
             end
           end
 
@@ -251,7 +260,7 @@ module CASClient
           end
 
           def setup_new_session(controller, st, vr)
-            controller.send(:reset_session)
+            controller.send(:clear_logins)
             log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{vr.user.inspect} is VALID.")
             controller.session[client.username_session_key] = vr.user.dup
             controller.session[client.extra_attributes_session_key] = HashWithIndifferentAccess.new(vr.extra_attributes.dup)

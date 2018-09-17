@@ -55,7 +55,7 @@ module CASClient
           params.delete(:format) if params[:format].to_s == 'html'
 ::Rails.logger.info params.inspect
 
-          service_url = controller.url_for(params)
+          service_url = controller.url_for(params.permit!)
           ::Rails.logger.info("Guessed service url: #{service_url.inspect}")
           return service_url
         end
