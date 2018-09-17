@@ -55,7 +55,7 @@ module CASClient
           params.delete(:format) if params[:format].to_s == 'html'
 ::Rails.logger.info params.inspect
 
-          service_url = controller.url_for(params)
+          service_url = controller.url_for(params.permit!)
           ::Rails.logger.info("Guessed service url: #{service_url.inspect}")
           return service_url
         end
@@ -81,10 +81,11 @@ module CASClient
         # ways. 
         # If given, the optional <tt>service</tt> URL overrides 
         # <tt>request.referer</tt>.
-        def self.logout(controller, service = nil)
+        def self.logout(controller, service = nil, logout_redirect = false)
           referer = service || controller.request.referer
           st = controller.session[:cas_last_valid_ticket]
           controller.send(:reset_session)
+          controller.send(:redirect_to, client.logout_url(referer)) if logout_redirect
         end
 
         def self.redirect_to_cas_for_authentication(controller)

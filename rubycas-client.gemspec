@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rubycas-client}
-  s.version = "2.0.9997"
+  s.version = "2.0.9997.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Zukowski", "Matt Walker"]
@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.2.0}
   s.summary = %q{Client library for the Central Authentication Service (CAS) protocol.}
 
-  s.add_dependency("activesupport", '~> 3.2')
+  s.add_dependency("activesupport")
   s.add_development_dependency("rails")
 end
