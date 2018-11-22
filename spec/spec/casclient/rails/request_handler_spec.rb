@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec/spec_helper"
 
 describe CASClient::Frameworks::Rails::RequestHandler do
 
@@ -11,7 +11,8 @@ describe CASClient::Frameworks::Rails::RequestHandler do
     @session = double(:session, :[] => nil, :[]=  => nil)
 
     @request = double(:request, :headers => { "CONTENT_TYPE" => nil }, :post? => false)
-    @controller = double(:controller, :session => @session, :params => {}, :request => @request, :url_for => "/some_resource/2")
+    params = ActionController::Parameters.new
+    @controller = double(:controller, session: @session, params: params, request: @request, url_for: "/some_resource/2", reset_session: nil)
     @request_handler = CASClient::Frameworks::Rails::RequestHandler.new(@controller)
 
     CASClient::Frameworks::Rails::Filter.log = double(:log, :error => nil, :warn => nil, :debug => nil, :info => nil)
@@ -34,7 +35,7 @@ describe CASClient::Frameworks::Rails::RequestHandler do
       @session.should_receive(:[]=).with(:cas_user, "12345")
       @session.should_receive(:[]=).with(:casfilteruser, "12345")
       @session.should_receive(:[]=).with(:cas_extra_attributes, {})
-      @session.should_receive(:[]=).with(:cas_last_valid_ticket, @ticket)
+      @session.should_receive(:[]=).with(:cas_last_valid_ticket, renew: false, service: "http://service.com", ticket: "my_ticket")
       @request_handler.handle_request.should == :allow
     end
 
