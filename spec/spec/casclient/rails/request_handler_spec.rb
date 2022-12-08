@@ -35,8 +35,6 @@ describe CASClient::Frameworks::Rails::RequestHandler do
       @session.should_receive(:[]=).with(:cas_user, "12345")
       @session.should_receive(:[]=).with(:casfilteruser, "12345")
       @session.should_receive(:[]=).with(:cas_extra_attributes, {})
-      pending
-      # TODO
       @session.should_receive(:[]=).with(:cas_last_valid_ticket, renew: false, service: "http://service.com", ticket: "my_ticket")
       @request_handler.handle_request.should == :allow
     end
