@@ -1,16 +1,17 @@
-source 'http://rubygems.org'
+source "http://rubygems.org"
 
 
 group :test, :development do
-  gem "rails"
+  gem "rails", "~> 7.0"
+  gem "sqlite3"
   gem "rspec"
-  gem 'rspec-rails'
+  gem "rspec-rails"
 end
 
 gemspec
 
 group :development do
-  gem "konvenit_style", git: "git@github.com:konvenit/konvenit_style.git"
+  gem "konvenit_style", git: "https://github.com/konvenit/konvenit_style"
 end
 
 group :test do
