@@ -18,9 +18,6 @@ ActiveRecord::Base.establish_connection(
 
 require_relative "app/controllers/application_controller"
 
-
-
-
 require "rspec"
 require "rspec/rails"
 require "rspec/expectations"
