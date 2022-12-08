@@ -1,4 +1,4 @@
-require "spec/spec_helper"
+require "spec_helper"
 
 describe CASClient::Client do
   context "with standard URL scheme" do
