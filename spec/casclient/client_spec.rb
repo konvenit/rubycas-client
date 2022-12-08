@@ -36,7 +36,7 @@ describe CASClient::Client do
 
     describe "cas_server_is_up?" do
       it "should use internal_login_url" do
-        http_response = double(:http_response, :body => "", :kind_of? => Net::HTTPSuccess)
+        http_response = double(:http_response, body: "", kind_of?: Net::HTTPSuccess)
         http          = double(:http, :use_ssl= => nil, :use_ssl? => true, :start => http_response)
         expect(Net::HTTP).to receive(:new).with("login.somewhere.com", 443).and_return(http)
         client.cas_server_is_up?
@@ -45,7 +45,7 @@ describe CASClient::Client do
 
     describe "login_to_service" do
       it "should use internal_login_url" do
-        http_response = double(:http_response, :body => "", :kind_of? => Net::HTTPSuccess, :to_hash => {})
+        http_response = double(:http_response, body: "", kind_of?: Net::HTTPSuccess, to_hash: {})
         http          = double(:http, :use_ssl= => nil, :use_ssl? => true, :start => http_response)
         expect(http).to receive(:post).with("/loginTicket", ";").and_return(http_response)
         expect(Net::HTTP).to receive(:new).with("login.somewhere.com", 443).and_return(http).exactly(2).times
@@ -92,7 +92,7 @@ describe CASClient::Client do
 
     describe "cas_server_is_up?" do
       it "should use internal_login_url" do
-        http_response = double(:http_response, :body => "", :kind_of? => Net::HTTPSuccess)
+        http_response = double(:http_response, body: "", kind_of?: Net::HTTPSuccess)
         http          = double(:http, :use_ssl= => nil, :use_ssl? => false, :start => http_response)
         expect(Net::HTTP).to receive(:new).with("internal_login", 80).and_return(http)
         client.cas_server_is_up?
@@ -101,7 +101,7 @@ describe CASClient::Client do
 
     describe "login_to_service" do
       it "should use internal_login_url" do
-        http_response = double(:http_response, :body => "", :kind_of? => Net::HTTPSuccess, :to_hash => {})
+        http_response = double(:http_response, body: "", kind_of?: Net::HTTPSuccess, to_hash: {})
         http          = double(:http, :use_ssl= => nil, :use_ssl? => false, :start => http_response)
         expect(http).to receive(:post).with("/loginTicket", ";").and_return(http_response)
         expect(Net::HTTP).to receive(:new).with("internal_login", 80).and_return(http).exactly(2).times
