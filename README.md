@@ -1,4 +1,4 @@
-# RubyCAS-Client  [![Build Status(https://github.com/konvenit/rubycas-client/actions/workflows/ci.yml/badge.svg)]
+# RubyCAS-Client [![Build Status(https://github.com/konvenit/rubycas-client/actions/workflows/ci.yml/badge.svg)]
 
 Author::    Matt Zukowski <matt AT roughest DOT net>; inspired by code by Ola Bini <ola.bini AT ki DOT se> and Matt Walker <mwalker AT tamu DOT edu>
 Copyright:: (c) 2008 Urbacon Ltd.
@@ -9,7 +9,7 @@ Websites::   http://code.google.com/p/rubycas-client
 
 
 
-=== RubyCAS-Client is a Ruby client library for Yale's Central Authentication Service (CAS) protocol.
+## RubyCAS-Client is a Ruby client library for Yale's Central Authentication Service (CAS) protocol.
 
 CAS provides a secure single sign on solution for web-based applications. The user logs in to your
 organization's CAS server, and is automatically authenticated for all other CAS-enabled applications.
@@ -17,14 +17,14 @@ organization's CAS server, and is automatically authenticated for all other CAS-
 For general information about the open CAS protocol, please have a look at http://www.ja-sig.org/products/cas.
 
 If your organization does not already have a CAS server, you may be interested in RubyCAS-Client's sister project,
-RubyCAS-Server[http://code.google.com/p/rubycas-server/].
+(RubyCAS-Server)[http://code.google.com/p/rubycas-server/].
 
 The RubyCAS-Client package includes adapters for Rails and Merb, although the client library itself can be
-adapted for other frameworks (for example an implementation for Camping is available via the Picnic[http://github.com/zuk/picnic/tree/master]
+adapted for other frameworks (for example an implementation for Camping is available via the (Picnic)[http://github.com/zuk/picnic/tree/master]
 library).
 
 
-== Getting help and reporting problems
+## Getting help and reporting problems
 
 If you need help, try posting to the RubyCAS discussion group at http://groups.google.com/group/rubycas-server.
 
@@ -33,7 +33,7 @@ To report problems, please use the Google Code issue tracker at http://code.goog
 API documentation (i.e. the RDocs) are available at http://rubycas-client.rubyforge.org
 
 
-== Installation
+## Installation
 
 You can download the latest version of RubyCAS-Client from the project's rubyforge page at
 http://rubyforge.org/projects/rubycas-client.
@@ -56,7 +56,7 @@ With Rails 2.1 or newer, it is also possible to install the plugin directly from
 
   ./script/plugin install git://github.com/gunark/rubycas-client.git
 
-== Usage Examples
+## Usage Examples
 
 If you'd rather jump right in, have a look at the example Rails and Merb applications pre-configured for CAS
 authentication:
@@ -67,7 +67,7 @@ http://github.com/gunark/rubycas-client/tree/master/examples
 Otherwise, continue reading for a step-by-step guide for integrating RubyCAS-Client with Rails:
 
 
-==== Using RubyCAS-Client in Rails controllers
+### Using RubyCAS-Client in Rails controllers
 
 <i>Note that from this point on we are assuming that you have a working CAS server up and running!</i>
 
@@ -101,7 +101,7 @@ filter method that checks for this value and does whatever you need it to do.
   require 'casclient/frameworks/rails/filter'
 
 
-==== A more complicated example
+#### A more complicated example
 
 Here is a more complicated configuration showing most of the configuration options along with their default values
 (this does not show proxy options, which are covered in the next section):
@@ -133,7 +133,7 @@ info under <tt>session[:cas_extra_attributes]</tt>).
 An arbitrary Logger instance can be given as the :logger parameter. In the example above we log all CAS activity to a
 <tt>log/cas.log</tt> file in your Rails app's directory.
 
-==== Re-authenticating on every request (i.e. the "single sign-out problem")
+#### Re-authenticating on every request (i.e. the "single sign-out problem")
 
 By default, the Rails filter will only authenticate with the CAS server when no session[:cas_user] value exists. Once the user
 has been authenticated, no further CAS forwarding is done until the user's session is wiped. This saves you
@@ -162,7 +162,7 @@ configuration option to true as, in the example in the previous section. However
 certainly have a deleterious impact on performance and can interfere with certain HTTP transactions (AJAX requests, for example).
 
 
-==== Defining a 'logout' action
+#### Defining a 'logout' action
 
 Your Rails application's controller(s) will probably have some sort of logout function. Here you can do any necessary local
 cleanup, and then call <tt>CASClient::Frameworks::Rails::Filter.logout(controller)</tt>. For example:
@@ -185,7 +185,7 @@ CAS server as a 'destination' parameter. This allows RubyCAS server to provide a
 the user to log back in to the service they just logged out from using a different username and password. Other
 CAS server implemenations may use this 'destination' parameter in different ways.
 
-==== Gatewayed (i.e. optional) authentication
+#### Gatewayed (i.e. optional) authentication
 
 "Gatewaying" essentially allows for optional CAS authentication. Users who already have a pre-existing CAS SSO session
 will be automatically authenticated for the gatewayed service, while those who do not will be allowed to access the service
@@ -207,7 +207,7 @@ To provide a login URL for unauthenticated users:
 
   <%= link_to("Login", CASClient::Frameworks::Rails::Filter.login_url(controller)) %>
 
-==== How to act as a CAS proxy
+#### How to act as a CAS proxy
 
 CAS 2.0 has a built-in mechanism that allows a CAS-authenticated application to pass on its authentication to other applications.
 An example where this is useful might be a portal site, where the user logs in to a central website and then gets forwarded to
