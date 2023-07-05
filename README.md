@@ -1,4 +1,4 @@
-# RubyCAS-Client [![Build Status(https://github.com/konvenit/rubycas-client/actions/workflows/ci.yml/badge.svg)]
+# RubyCAS-Client [![CI](https://github.com/konvenit/rubycas-client/actions/workflows/ci.yml/badge.svg)](https://github.com/konvenit/rubycas-client/actions/workflows/ci.yml)
 
 Author::    Matt Zukowski <matt AT roughest DOT net>; inspired by code by Ola Bini <ola.bini AT ki DOT se> and Matt Walker <mwalker AT tamu DOT edu>
 Copyright:: (c) 2008 Urbacon Ltd.
