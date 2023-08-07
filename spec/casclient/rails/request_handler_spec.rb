@@ -11,7 +11,7 @@ describe CASClient::Frameworks::Rails::RequestHandler do
 
     @request = double(:request, headers: { "CONTENT_TYPE" => nil }, post?: false)
     params = ActionController::Parameters.new
-    @controller = double(:controller, session: @session, params: params, request: @request, url_for: "/some_resource/2", reset_session: nil)
+    @controller = double(:controller, session: @session, params: params, request: @request, url_for: "/some_resource/2", clear_logins: nil)
     @request_handler = CASClient::Frameworks::Rails::RequestHandler.new(@controller)
 
     CASClient::Frameworks::Rails::Filter.log = double(:log, error: nil, warn: nil, debug: nil, info: nil)
