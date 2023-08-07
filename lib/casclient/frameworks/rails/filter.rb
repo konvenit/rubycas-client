@@ -53,15 +53,16 @@ module CASClient
           params = controller.params.dup
           params.delete(:ticket)
           params.delete(:format) if params[:format].to_s == 'html'
+          ::Rails.logger.info params.inspect
 
           service_url = controller.url_for(params.permit!)
-          ::Rails.logger.info("Guessed service url: #{service_url.inspect}") if ::Rails.logger
+          ::Rails.logger.info("Guessed service url: #{service_url.inspect}")
           return service_url
         end
 
-        # Returns the login URL for the current controller.
+        # Returns the login URL for the current controller. 
         # Useful when you want to provide a "Login" link in a GatewayFilter'ed
-        # action.
+        # action. 
         def self.login_url(controller)
           service_url = read_service_url(controller)
           url = client.add_service_to_login_url(service_url)
@@ -69,22 +70,22 @@ module CASClient
           return url
         end
 
-        # Clears the given controller's local Rails session, does some local
+        # Clears the given controller's local Rails session, does some local 
         # CAS cleanup, and redirects to the CAS logout page. Additionally, the
-        # <tt>request.referer</tt> value from the <tt>controller</tt> instance
-        # is passed to the CAS server as a 'destination' parameter. This
+        # <tt>request.referer</tt> value from the <tt>controller</tt> instance 
+        # is passed to the CAS server as a 'destination' parameter. This 
         # allows RubyCAS server to provide a follow-up login page allowing
-        # the user to log back in to the service they just logged out from
-        # using a different username and password. Other CAS server
-        # implemenations may use this 'destination' parameter in different
-        # ways.
-        # If given, the optional <tt>service</tt> URL overrides
+        # the user to log back in to the service they just logged out from 
+        # using a different username and password. Other CAS server 
+        # implemenations may use this 'destination' parameter in different 
+        # ways. 
+        # If given, the optional <tt>service</tt> URL overrides 
         # <tt>request.referer</tt>.
         def self.logout(controller, service = nil)
           referer = service || controller.request.referer
           st = controller.session[:cas_last_valid_ticket]
           controller.send(:reset_session)
-          controller.send(:redirect_to, client.logout_url(referer), allow_other_host: true)
+          controller.send(:redirect_to, client.logout_url(referer))
         end
 
         def self.redirect_to_cas_for_authentication(controller)

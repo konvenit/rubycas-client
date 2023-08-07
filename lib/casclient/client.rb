@@ -1,7 +1,7 @@
 module CASClient
   # The client brokers all HTTP transactions with the CAS server.
   class Client
-    attr_reader :cas_base_url, :ssl_verify_mode, :login_ticket_url
+    attr_reader :cas_base_url, :ssl_verify_mode
     attr_reader :log, :username_session_key, :extra_attributes_session_key
     attr_writer :login_url, :validate_url, :proxy_url, :logout_url, :service_url
     attr_accessor :proxy_callback_url, :proxy_retrieval_url
@@ -13,14 +13,13 @@ module CASClient
     def configure(conf)
       raise ArgumentError, "Missing :cas_base_url parameter!" unless conf[:cas_base_url]
 
-      @cas_base_url        = conf[:cas_base_url].gsub(/\/$/, '')
-      @login_url           = conf[:login_url]
-      @internal_login_url  = conf[:internal_login_url]
-      @logout_url          = conf[:logout_url]
-      @validate_url        = conf[:validate_url]
-      @proxy_url           = conf[:proxy_url]
-      @service_url         = conf[:service_url]
-      @login_ticket_url    = conf[:login_ticket_url]
+      @cas_base_url      = conf[:cas_base_url].gsub(/\/$/, '')
+
+      @login_url    = conf[:login_url]
+      @logout_url   = conf[:logout_url]
+      @validate_url = conf[:validate_url]
+      @proxy_url    = conf[:proxy_url]
+      @service_url  = conf[:service_url]
       @proxy_callback_url  = conf[:proxy_callback_url]
       @proxy_retrieval_url = conf[:proxy_retrieval_url]
       @ssl_verify_mode     = conf[:ssl_verify_mode]
@@ -36,16 +35,8 @@ module CASClient
       @login_url || (cas_base_url + "/login")
     end
 
-    def internal_login_url
-      @internal_login_url || login_url
-    end
-
     def validate_url
       @validate_url || (cas_base_url + "/proxyValidate")
-    end
-
-    def login_ticket_url
-      @login_ticket_url || (internal_login_url+"Ticket")
     end
 
     # Returns the CAS server's logout url.
@@ -108,13 +99,13 @@ module CASClient
     # Returns true if the configured CAS server is up and responding;
     # false otherwise.
     def cas_server_is_up?
-      uri = URI.parse(internal_login_url)
+      uri = URI.parse(login_url)
 
       log.debug "Checking if CAS server at URI '#{uri}' is up..."
 
       https = Net::HTTP.new(uri.host, uri.port)
       https.use_ssl = (uri.scheme == 'https')
-      if https.use_ssl? and @ssl_verify_mode
+      if https.use_ssl and @ssl_verify_mode
         https.verify_mode = @ssl_verify_mode
       end
 
@@ -142,7 +133,7 @@ module CASClient
         :service => service
       )
 
-      res = submit_data_to_cas(internal_login_url, data)
+      res = submit_data_to_cas(login_url, data)
       CASClient::LoginResponse.new(res)
     end
 
@@ -152,9 +143,9 @@ module CASClient
     # This only works with RubyCAS-Server, since obtaining login
     # tickets in this manner is not part of the official CAS spec.
     def request_login_ticket
-      uri = URI.parse(login_ticket_url)
+      uri = URI.parse(login_url+'Ticket')
       https = build_https(uri)
-      res = https.post(uri.path, ';')
+      res = https.post(uri.path, '&')
 
       raise CASException, res.body unless res.kind_of? Net::HTTPSuccess
 
@@ -246,7 +237,7 @@ module CASClient
     def submit_data_to_cas(uri, data)
       uri = URI.parse(uri) unless uri.kind_of? URI
       req = Net::HTTP::Post.new(uri.path)
-      req.set_form_data(data)
+      req.set_form_data(data, '&')
       build_https(uri).start {|conn| conn.request(req) }
     end
 
