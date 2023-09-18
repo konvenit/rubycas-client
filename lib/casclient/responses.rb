@@ -73,7 +73,7 @@ module CASClient
         
         # unserialize extra attributes
         @extra_attributes.each do |k, v|
-          v.blank? ? @extra_attributes[k] = nil : @extra_attributes[k] = YAML.load(v)  
+          v.blank? ? @extra_attributes[k] = nil : @extra_attributes[k] = YAML.safe_load(v, permitted_classes: [Symbol, Time], aliases: true)
         end
       elsif is_failure?
         @failure_code = @xml.elements['//cas:authenticationFailure'].attributes['code']
