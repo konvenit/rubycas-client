@@ -18,5 +18,4 @@ Gem::Specification.new do |s|
   s.summary = %q{Client library for the Central Authentication Service (CAS) protocol.}
 
   s.add_dependency("activesupport")
-  s.add_development_dependency("rails")
 end
