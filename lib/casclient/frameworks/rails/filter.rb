@@ -54,7 +54,13 @@ module CASClient
           params.delete(:ticket)
           params.delete(:format) if params[:format].to_s == 'html'
 
-          service_url = controller.url_for(params.permit!)
+          # Merge with default_url_options if available
+          url_options = params.permit!
+          if controller.respond_to?(:default_url_options)
+            url_options = url_options.merge(controller.default_url_options)
+          end
+
+          service_url = controller.url_for(url_options)
           ::Rails.logger.info("Guessed service url: #{service_url.inspect}") if ::Rails.logger
           return service_url
         end
