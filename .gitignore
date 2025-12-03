@@ -1,6 +1,7 @@
 .svn
 pkg
-doc
+/doc
+/html
 *.swp
 .DS_Store
 spec/rubycas-client.sqlite3.db
